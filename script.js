@@ -1,28 +1,58 @@
-document.getElementById('file-input').addEventListener('change', function(event) {
+// Function to stop Quagga live camera feed
+function stopQuagga() {
+    Quagga.stop();
+    console.log("Camera feed stopped.");
+}
+
+// Initialize Quagga for live camera scanning
+Quagga.init({
+    inputStream: {
+        type: "LiveStream",
+        target: document.querySelector('#camera-box'),
+        constraints: {
+            width: 800,
+            height: 600,
+            facingMode: "environment" // Use the back camera if available
+        },
+    },
+    decoder: {
+        readers: ["code_128_reader"] // Add other readers if needed
+    },
+}, function (err) {
+    if (err) {
+        console.error(err);
+        return;
+    }
+    console.log("Quagga initialized.");
+    Quagga.start(); // Start the live camera feed
+});
+
+// Listen for detected barcodes and log them to the console
+Quagga.onDetected(function (data) {
+    const code = data.codeResult.code;
+    console.log("Barcode detected: ", code);
+});
+
+// Handle file input for scanning
+document.getElementById('file-input').addEventListener('change', function (event) {
     const input = event.target;
     if (input.files && input.files[0]) {
+        stopQuagga(); // Stop live camera feed
+
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             const cameraBox = document.getElementById('camera-box');
             cameraBox.style.backgroundImage = `url(${e.target.result})`;
 
-            // Optionally, hide the scanner line if an image is loaded
+            // Show the scanner line
             const scanner = document.querySelector('.scanner');
             if (scanner) {
                 scanner.style.display = 'block';
             }
-        };
-        reader.readAsDataURL(input.files[0]);
-    }
-});
 
-document.getElementById('scan-btn').addEventListener('click', function() {
-    const input = document.getElementById('file-input');
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
+            // Decode the barcode from the image
             const img = new Image();
-            img.onload = function() {
+            img.onload = function () {
                 Quagga.decodeSingle({
                     src: img.src,
                     numOfWorkers: 0,
@@ -30,20 +60,20 @@ document.getElementById('scan-btn').addEventListener('click', function() {
                         size: 800
                     },
                     decoder: {
-                        readers: ["code_128_reader"]
+                        readers: ["code_128_reader"] // Add other readers if needed
                     },
-                }, function(result) {
-                    if(result && result.codeResult) {
-                        alert("Barcode detected: " + result.codeResult.code);
+                }, function (result) {
+                    if (result && result.codeResult) {
+                        console.log("Barcode detected from file: ", result.codeResult.code);
                     } else {
-                        alert("No barcode detected.");
+                        console.log("No barcode detected in the file.");
                     }
                 });
             };
-            img.src = event.target.result;
+            img.src = e.target.result;
         };
         reader.readAsDataURL(input.files[0]);
     } else {
-        alert("Please choose an image file.");
+        console.log("Please choose an image file.");
     }
 });
