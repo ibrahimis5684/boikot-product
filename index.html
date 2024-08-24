@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boikot Product</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="camera" id="camera-box">
+            <div class="scanner"></div>
+        </div>
+        <input type="file" id="file-input" accept="image/*" class="file-input" hidden>
+        <label for="file-input" class="file-input-label">Choose File</label>
+        <button class="scan-btn" id="scan-btn">Scan Barcodes</button>
+    </div>
+    <!-- JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
